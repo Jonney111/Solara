@@ -2,10 +2,8 @@ name: 🔄 Sync Fork with Upstream
 
 on:
   schedule:
-    - cron: '0 2 * * *' # 每天凌晨2点自动同步（UTC时间）
-  workflow_dispatch: # 手动触发
-  watch:
-    types: [started] # 你点Star时也可以触发（可删）
+    - cron: '0 2 * * *' # 每天凌晨2点自动同步（UTC）
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -14,7 +12,7 @@ jobs:
       - name: 🧩 Checkout your repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # 禁止默认token
+          persist-credentials: false
           fetch-depth: 0
 
       - name: 🧭 Set up Git user
@@ -30,7 +28,5 @@ jobs:
       - name: 🔄 Merge upstream changes
         run: |
           git checkout main
-          git merge upstream/main --allow-unrelated-histories -m "🔄 Sync from upstream"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git merge upstream/main --allow-unrelated-histories -m "🔄 Sync from upstream" || echo "No new changes"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} main
